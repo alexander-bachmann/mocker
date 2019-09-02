@@ -1,9 +1,18 @@
 """
 GUI
-take screenshot - notification copied to clipboard
 
-display screenshot that was taken
-display text that was generated
+buttons:
+spongebob mock - SpONgEbOB
+vaporwave - V A P O R  W A V E
+pig latin -  Igpay Atinlay
+reverse - esrever
+text-box to paste/type into
+
+create default to_mock.png and use that when program opens
+reset (to fix if to_mock.png breaks)
+
+
+screenshot button to take screen shot
 
 
 """
@@ -16,7 +25,7 @@ import pytesseract # image to string
 from pynput.mouse import Listener # to listen to mouse clicks
 import tkinter as tk # gui
 
-pytesseract.pytesseract.tesseract_cmd = r'C:\Program Files\Tesseract-OCR\tesseract'
+# pytesseract.pytesseract.tesseract_cmd = r'C:\Program Files\Tesseract-OCR\tesseract'
 
 class Mocker:
     def __init__(self):
@@ -24,16 +33,14 @@ class Mocker:
         self.top_left_y = 0
         self.bot_right_x = 0
         self.bot_right_y = 0
-
         self.click_x = 0
         self.click_y = 0
+        self.sentence = pytesseract.image_to_string("to_mock.png")
 
     def on_click(self, x, y, button, pressed):
         if pressed:
-            # print ('Clicked ({0}, {1})'.format(x, y))
             self.click_x = x
             self.click_y = y
-
         if not pressed:
             return False
 
@@ -42,32 +49,26 @@ class Mocker:
         with Listener(on_click=self.on_click) as listener:
             listener.join()
         return
-        # print("Finished listening")
 
 
     def get_screenshot_coordinates(self):
-        # print("To take screenshot: right click top left and bottom right of area")
         self.listen()
         self.top_left_x = self.click_x
         self.top_left_y = self.click_y
         self.listen()
         self.bot_right_x = self.click_x
         self.bot_right_y = self.click_y
-        # print("Top left: x = " + str(self.top_left_x) + " y = " + str(self.top_left_y))
-        # print("Bot right: x = " + str(self.bot_right_x) + " y = " + str(self.bot_right_y))
-
 
     def take_screenshot(self):
         width = self.bot_right_x - self.top_left_x
         height = self.bot_right_y - self.top_left_y
         screenshot = pyautogui.screenshot(region=(self.top_left_x, self.top_left_y, width, height))
         screenshot.save("to_mock.png")
-        # print("screenshot saved")
-
+        self.sentence = pytesseract.image_to_string("to_mock.png")
         return screenshot
 
-
-    def mock(self):
+    # changes the self.sentence for every type of mock
+    def spongebob_mock(self):
         mock_sentence = pytesseract.image_to_string("to_mock.png")
 
         mock_sentence = mock_sentence.lower()
@@ -90,9 +91,40 @@ class Mocker:
                     mocked[i] = mocked[i].lower()
 
         mocked_sentence = "".join(mocked)
-        # adding to clipboard
         pyperclip.copy(mocked_sentence)
+        self.sentence = mocked_sentence
         return mocked_sentence
+
+
+    def vaporwave_mock(self):
+        mock_sentence = pytesseract.image_to_string("to_mock.png")
+
+        mock_sentence = mock_sentence.upper()
+        mocked_sentence = list(mock_sentence)
+        mocked = []
+
+        for i in range(len(mock_sentence)):
+            mocked += mock_sentence[i]
+            mocked += " "
+
+        mocked_sentence = "".join(mocked)
+
+        pyperclip.copy(mocked_sentence)
+        self.sentence = mocked_sentence
+        return mocked_sentence
+
+
+    def reverse_mock(self):
+        mock_sentence = pytesseract.image_to_string("to_mock.png")
+        mocked_sentence = list(mock_sentence)
+        mocked_sentence.reverse()
+
+        mocked_sentence = "".join(mocked_sentence)
+
+        pyperclip.copy(mocked_sentence)
+        self.sentence = mocked_sentence
+        return mocked_sentence
+
 
 
 def combine_funcs(*funcs):
@@ -107,19 +139,50 @@ class GUI:
         self.master = master
         self.mocker = Mocker()
         self.current_screenshot = tk.PhotoImage(file="to_mock.png")
+
         self.screenshot_label = tk.Label(self.master, image=self.current_screenshot)
-        self.screenshot_label.pack()
-        self.screenshot_button = tk.Button(self.master, text="SCREENSHOT (right click NW and SE)", command=combine_funcs(self.mocker.get_screenshot_coordinates, self.mocker.take_screenshot, self.mocker.mock, self.update_labels))
+
+        self.screenshot_button = tk.Button(self.master, text="Screenshot (right click NW and SE)", command=combine_funcs(self.mocker.get_screenshot_coordinates, self.mocker.take_screenshot, self.update_labels))
         self.screenshot_button.pack(side="bottom")
 
-    def update_labels(self):
-        self.screenshot_label.pack_forget()
-        self.current_screenshot = tk.PhotoImage(file="to_mock.png")
-        self.screenshot_label = tk.Label(self.master, image=self.current_screenshot)
+        self.spongebob_button = tk.Button(self.master, text="SpONgEbOB", command=combine_funcs(self.mocker.spongebob_mock, self.update_labels))
+        self.spongebob_button.pack(side="top")
+
+        self.vaporwave_button = tk.Button(self.master, text = "V A P O R  W A V E", command=combine_funcs(self.mocker.vaporwave_mock, self.update_labels))
+        self.vaporwave_button.pack(side="top")
+
+        self.reverse_button = tk.Button(self.master, text = "esreveR", command=combine_funcs(self.mocker.reverse_mock, self.update_labels))
+        self.reverse_button.pack(side="top")
+
         self.screenshot_label.pack()
 
+        collected_text = tk.StringVar()
+        self.collected_text_label = tk.Label(self.master, textvariable=collected_text)
+        collected_text.set(self.mocker.sentence)
+        self.collected_text_label.pack()
 
-gui = tk.Tk()
-gui.title("Spongebob Mocker")
-GUI(gui)
-gui.mainloop()
+
+# BREAK UP INTO MULTIPLE UPDATES
+    def update_labels(self):
+
+        # update current screenshot
+        self.current_screenshot = tk.PhotoImage(file="to_mock.png")
+        self.screenshot_label.pack_forget()
+        self.screenshot_label = tk.Label(self.master, image=self.current_screenshot)
+        self.screenshot_label.pack(side="top")
+
+        # updates text
+        self.collected_text_label.pack_forget()
+        collected_text = tk.StringVar()
+        self.collected_text_label = tk.Label(self.master, textvariable=collected_text)
+        collected_text.set(self.mocker.sentence)
+        self.collected_text_label.pack()
+
+
+
+
+if __name__ == "__main__":
+    gui = tk.Tk()
+    gui.title("Mock by Bok")
+    GUI(gui)
+    gui.mainloop()
