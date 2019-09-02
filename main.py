@@ -8,9 +8,9 @@ text-box to paste/type into
 create default to_mock.png and use that when program opens
 reset (to fix if to_mock.png breaks)
 
-separate into multiple class files
-instead of one large single .py file
+add comments to each function that isn't easily readable
 
+combine_funcs - maybe remove or find better way for buttons
 
 add to README.md
     packages/modules install commands
@@ -19,15 +19,15 @@ add to README.md
     why certain modules are used and for what
 
 
-
-random # generating the mocked sentence
-pyperclip # to add to clipboard
-from PIL import Image
-pyautogui # to take screenshot
-pytesseract # image to string
-pynput.mouse import Listener # to listen to mouse clicks
-tkinter for gui
+Modules and their use:
+    random - used in randomizing the capitalization in the spongebob mock
+    pyperclip - adds the mocked text to the user's clipboard
+    pyautogui - take screenshot of sentence user is wishing to mock
+    pytesseract - converts text from screenshot into useable string
+    pynput.mouse's Listener - listen to mouse clicks for screenshot dimensions
+    tkinter - graphical user interface
 """
+
 
 from mocker import Mocker
 from gui import GUI

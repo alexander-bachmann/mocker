@@ -1,6 +1,5 @@
 import random
 import pyautogui
-from PIL import Image
 import pytesseract
 import pyperclip
 from pynput.mouse import Listener
