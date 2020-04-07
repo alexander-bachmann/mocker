@@ -13,6 +13,7 @@ class Mocker:
         self.bot_right_y = 0
         self.click_x = 0
         self.click_y = 0
+        # pytesseract.pytesseract.tesseract_cmd = r'C:\Program Files\Tesseract-OCR\tesseract'
         self.sentence = pytesseract.image_to_string("to_mock.png")
 
 
