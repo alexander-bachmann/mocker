@@ -2,6 +2,7 @@ from mocker import Mocker
 import tkinter as tk
 
 
+
 def combine_funcs(*funcs):
     def combined_func(*args, **kwargs):
         for f in funcs:
@@ -17,8 +18,11 @@ class GUI:
 
         self.screenshot_label = tk.Label(self.master, image=self.current_screenshot)
 
-        self.screenshot_button = tk.Button(self.master, text="Screenshot (right click NW and SE)", command=combine_funcs(self.mocker.get_screenshot_coordinates, self.mocker.take_screenshot, self.update_labels))
+        self.screenshot_button = tk.Button(self.master, text="Screenshot", command=combine_funcs(self.mocker.get_screenshot_coordinates, self.mocker.take_screenshot, self.update_labels))
         self.screenshot_button.pack(side="bottom")
+
+        self.listen_button = tk.Button(self.master, text="Listen", command=combine_funcs(self.mocker.microphone_listen, self.update_labels))
+        self.listen_button.pack(side="bottom")
 
         self.spongebob_button = tk.Button(self.master, text="SpONgEbOB", command=combine_funcs(self.mocker.spongebob_mock, self.update_labels))
         self.spongebob_button.pack(side="top")
@@ -28,6 +32,7 @@ class GUI:
 
         self.reverse_button = tk.Button(self.master, text = "esreveR", command=combine_funcs(self.mocker.reverse_mock, self.update_labels))
         self.reverse_button.pack(side="top")
+
 
         self.screenshot_label.pack()
 

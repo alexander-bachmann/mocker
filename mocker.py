@@ -2,6 +2,7 @@ import random
 import pyautogui
 import pytesseract
 import pyperclip
+import speech_recognition as sr
 from pynput.mouse import Listener
 
 
@@ -13,7 +14,8 @@ class Mocker:
         self.bot_right_y = 0
         self.click_x = 0
         self.click_y = 0
-        # pytesseract.pytesseract.tesseract_cmd = r'C:\Program Files\Tesseract-OCR\tesseract'
+        self.mock_image = True
+        pytesseract.pytesseract.tesseract_cmd = r'C:\Program Files\Tesseract-OCR\tesseract'
         self.sentence = pytesseract.image_to_string("to_mock.png")
 
 
@@ -31,6 +33,26 @@ class Mocker:
         return
 
 
+    def microphone_listen(self):
+        self.mock_image = False
+
+        r = sr.Recognizer()
+        with sr.Microphone() as source:
+            # print("Say something!")
+            audio = r.listen(source)
+
+        try:
+            text = r.recognize_google(audio)
+            # print("Google Speech Recognition thinks you said " + text)
+            self.sentence = text
+
+        except sr.UnknownValueError:
+            print("Google Speech Recognition could not understand audio")
+        except sr.RequestError as e:
+            print("Could not request results from Google Speech Recognition service; {0}".format(e))
+
+
+
     def get_screenshot_coordinates(self):
         self.listen()
         self.top_left_x = self.click_x
@@ -41,6 +63,7 @@ class Mocker:
 
 
     def take_screenshot(self):
+        self.mock_image = True
         width = self.bot_right_x - self.top_left_x
         height = self.bot_right_y - self.top_left_y
         screenshot = pyautogui.screenshot(region=(self.top_left_x, self.top_left_y, width, height))
@@ -51,7 +74,10 @@ class Mocker:
 
     # changes the self.sentence for every type of mock
     def spongebob_mock(self):
-        mock_sentence = pytesseract.image_to_string("to_mock.png")
+        if self.mock_image == True:
+            mock_sentence = pytesseract.image_to_string("to_mock.png")
+        else:
+            mock_sentence = self.sentence
 
         mock_sentence = mock_sentence.lower()
         mock_sentence = list(mock_sentence)
@@ -79,7 +105,10 @@ class Mocker:
 
 
     def vaporwave_mock(self):
-        mock_sentence = pytesseract.image_to_string("to_mock.png")
+        if self.mock_image == True:
+            mock_sentence = pytesseract.image_to_string("to_mock.png")
+        else:
+            mock_sentence = self.sentence
 
         mock_sentence = mock_sentence.upper()
         mocked_sentence = list(mock_sentence)
@@ -97,7 +126,11 @@ class Mocker:
 
 
     def reverse_mock(self):
-        mock_sentence = pytesseract.image_to_string("to_mock.png")
+        if self.mock_image == True:
+            mock_sentence = pytesseract.image_to_string("to_mock.png")
+        else:
+            mock_sentence = self.sentence
+
         mocked_sentence = list(mock_sentence)
         mocked_sentence.reverse()
 
